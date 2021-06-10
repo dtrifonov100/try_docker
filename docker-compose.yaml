@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+  node-api:
+    container_name: try_dock_node
+    build:
+      context: .
+      dockerfile: ./dockerfiles/Node.Dockerfile
+    image: node
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+  db:
+    container_name: try_dock_postgres
+    image: postgres:13
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: '123456'
+      POSTGRES_DB: 'try_dock'
+      PGDATA: /var/lib/postgresql/data/
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+    restart: always
+  redis:
+    container_name: try_dock_redis
+    image: redis:6
+    ports:
+      - 6379:6379
+volumes:
+  pgdata:
