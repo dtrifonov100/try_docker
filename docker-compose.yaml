@@ -10,6 +10,8 @@ services:
       - db
     ports:
       - "3000:3000"
+    networks:
+      - try_docker_network
   db:
     container_name: try_dock_postgres
     image: postgres:13
@@ -23,10 +25,17 @@ services:
     ports:
       - "5435:5432"
     restart: always
+    networks:
+      - try_docker_network
+
   redis:
     container_name: try_dock_redis
     image: redis:6
     ports:
       - 6379:6379
+    networks:
+      - try_docker_network
 volumes:
   pgdata:
+networks:
+  try_docker_network:
