@@ -1,53 +1,57 @@
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express');
 const app = express();
-const {DataTypes, Model } = require('sequelize');
-const {sequelize} = require('./database/database');
+const { DataTypes, Model } = require('sequelize');
+const { sequelize } = require('./database/database');
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const models = async () => {
   class User extends Model {}
-  User.init({
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+  User.init(
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
+      name: {
+        type: DataTypes.STRING,
+        // allowNull defaults to true
+      },
+      // createdAt: {
+      //   defaultValue: Date.now(),
+      //   type: DataTypes.timestamp
+      // }
     },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false
-    },
-    name: {
-      type: DataTypes.STRING
-      // allowNull defaults to true
-    },
-    // createdAt: {
-    //   defaultValue: Date.now(),
-    //   type: DataTypes.timestamp
-    // }
-  }, {
-    // Other model options go here
-    sequelize, // We need to pass the connection instance
-    tableName: 'users',
-    modelName: 'User' // We need to choose the model name
-  });
-  await User.sync({ force: true });
+    {
+      // Other model options go here
+      sequelize, // We need to pass the connection instance
+      tableName: 'users',
+      modelName: 'User', // We need to choose the model name
+    }
+  );
+  await User.sync({ force: false });
   // SEED
   const userCount = await User.count();
   if (userCount === 0) {
     User.create({
       name: 'petya',
-      email: 'test@mail.com'
-    })
+      email: 'test@mail.com',
+    });
   }
-  console.log();
   app.get('/', async (req, res) => {
     console.log(req.url);
     res.status(200).json({
       success: true,
-      a:5
-    })
+      a: 5,
+    });
   });
   app.get('/users', async (req, res) => {
     const users = await User.findAll();
@@ -55,19 +59,19 @@ const models = async () => {
     res.status(200).json({
       success: true,
       users,
-    })
+    });
   });
   app.post('/users', async (req, res) => {
     const user = await User.create({
       name: 'Dima',
-      email: 'test_2@mail.com'
+      email: 'test_2@mail.com',
     });
     res.status(200).json({
       success: true,
       user,
-    })
+    });
   });
-}
+};
 models();
 
 // the defined model is the class itself
@@ -79,6 +83,6 @@ const start = async () => {
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
-}
+};
 start();
-app.listen(PORT, () => console.log(`SERVER NODE JS PORT ${PORT}`))
+app.listen(PORT, () => console.log(`SERVER NODE JS PORT ${PORT}`));
